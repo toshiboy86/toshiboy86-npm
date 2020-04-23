@@ -6,7 +6,7 @@ executors:
       - image: circleci/node:10.18.0-buster
 
 commands:
-  npm_auth_setting:
+  authenticate_npm:
     steps:
       - run:
           name: Authenticate with registry
@@ -17,19 +17,19 @@ commands:
           name: Publish package
           command: npm publish
 jobs:
-  build:
+  publish:
     executor: default
     steps:
       - checkout
-      - npm_auth_setting
+      - authenticate_npm
       - npm_publish
 
 workflows:
-  build_and_test:
+  build_and_publish_npm:
     jobs:
-      - build:
-        filters:
-          tags:
-            only: /^qa-v.*/
-          branches:
-            ignore: /.*/
+      - publish:
+          filters:
+            tags:
+              only: /^qa-v.*/
+            branches:
+              ignore: /.*/
