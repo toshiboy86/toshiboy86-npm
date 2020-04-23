@@ -1,0 +1,23 @@
+version: 2.1
+
+executors:
+  default:
+    docker:
+      - image: circleci/node:10.18.0-buster
+jobs:
+  publish:
+    - run:
+        name: Authenticate with registry
+        command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/.npmrc
+    - run:
+        name: Publish package
+        command: npm publish
+workflows:
+  npm_publish:
+    jobs:
+      - publish:
+        filters:
+          tags:
+            only: /^qa-v.*/
+          branches:
+            ignore: /.*/
