@@ -5,20 +5,29 @@ executors:
     docker:
       - image: circleci/node:10.18.0-buster
 
+commands:
+  npm_auth_setting:
+    steps:
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/.npmrc
+  npm_publish:
+    steps:
+      - run:
+          name: Publish package
+          command: npm publish
 jobs:
-  publish:
-    steps: 
-      - run:
-        name: Authenticate with registry
-        command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/.npmrc
-      - run:
-        name: Publish package
-        command: npm publish
+  build:
+    executor: default
+    steps:
+      - checkout
+      - npm_auth_setting
+      - npm_publish
 
 workflows:
-  npm_publish:
+  build_and_test:
     jobs:
-      - publish:
+      - build:
         filters:
           tags:
             only: /^qa-v.*/
